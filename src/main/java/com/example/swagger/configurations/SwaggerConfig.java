@@ -43,4 +43,11 @@ public class SwaggerConfig {
                 .pathsToMatch("/api/v1/layout/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi groupApi3() {
+        return GroupedOpenApi.builder()
+                .group("student-api")
+                .pathsToMatch("/student/**")
+                .build();
+    }
 }

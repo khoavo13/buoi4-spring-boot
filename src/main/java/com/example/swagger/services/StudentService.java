@@ -2,7 +2,11 @@ package com.example.swagger.services;
 
 import com.example.swagger.models.Student;
 import com.example.swagger.repositories.StudentRepository;
+import com.example.swagger.responses.StudentResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,5 +48,25 @@ public class StudentService implements IStudentService{
     @Override
     public void deleteStudent(Long id) {
         studentRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<Student> getStudents(Pageable pageable) {
+        return studentRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Student> findByTen(String ten) {
+        return studentRepository.findByTenContainingIgnoreCase(ten);
+    }
+
+    @Override
+    public List<Student> findByThanhPho(String name) {
+        return studentRepository.findByThanhPho(name);
+    }
+
+    @Override
+    public List<Student> findByThanhPhoAndTen(String name) {
+        return studentRepository.findByThanhPhoAndTen(name);
     }
 }
