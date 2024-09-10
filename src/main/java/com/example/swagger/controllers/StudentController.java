@@ -1,5 +1,6 @@
 package com.example.swagger.controllers;
 
+import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.exceptions.ResourceNotFoundException;
 import com.example.swagger.models.Student;
 import com.example.swagger.responses.ApiResponse;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +24,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/student")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class StudentController {
 
     private final StudentService studentService;
 
     @PostMapping("")
-    public ResponseEntity<ApiResponse>  addStudent(@Valid @RequestBody Student student, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse>  addStudent(@Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
             ApiResponse apiResponse = ApiResponse.builder()
@@ -38,7 +41,7 @@ public class StudentController {
             return ResponseEntity.badRequest().body(apiResponse);
         }
 
-        Student student1 = studentService.addStudent(student);
+        Student student1 = studentService.addStudent(studentDTO);
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(student1)
                 .message("Inserted successfully")
@@ -91,10 +94,16 @@ public class StudentController {
     public ResponseEntity<ApiResponse> getAllStudentsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Student> studentPage = studentService.getStudents(pageRequest);
+        PageRequest pageRequest =  PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<StudentResponse> studentPage = studentService.getAllStudents(pageRequest);
+        int totalPages = studentPage.getTotalPages();
+        List<StudentResponse> studentList = studentPage.getContent();
+        StudentListResponse studentListResponse = StudentListResponse.builder()
+                .students(studentList)
+                .totalPages(totalPages)
+                .build();
         ApiResponse apiResponse = ApiResponse.builder()
-                .data(studentPage)
+                .data(studentListResponse)
                 .message("Show students successfully")
                 .status(HttpStatus.OK.value())
                 .build();
@@ -103,7 +112,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateStudent(@PathVariable Long id, @Valid @RequestBody Student student, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<String> errors = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
             ApiResponse apiResponse = ApiResponse.builder()
@@ -114,7 +123,7 @@ public class StudentController {
             return ResponseEntity.badRequest().body(apiResponse);
         }
 
-        Student student1 = studentService.updateStudent(id, student);
+        Student student1 = studentService.updateStudent(id, studentDTO);
         if (student1 == null) {
             throw new ResourceNotFoundException("Student khong tim thay voi id: " + id);
         }

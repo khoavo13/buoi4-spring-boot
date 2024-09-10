@@ -1,5 +1,6 @@
 package com.example.swagger.services;
 
+import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.models.Student;
 import com.example.swagger.repositories.StudentRepository;
 import com.example.swagger.responses.StudentResponse;
@@ -15,23 +16,23 @@ import java.util.List;
 public class StudentService implements IStudentService{
     private final StudentRepository studentRepository;
     @Override
-    public Student addStudent(Student student) {
+    public Student addStudent(StudentDTO studentDTO) {
         Student student1 = Student.builder()
-                .ten(student.getTen())
-                .thanhPho(student.getThanhPho())
-                .ngaySinh(student.getNgaySinh())
-                .xepLoai(student.getXepLoai())
+                .ten(studentDTO.getTen())
+                .thanhPho(studentDTO.getThanhPho())
+                .ngaySinh(studentDTO.getNgaySinh())
+                .xepLoai(studentDTO.getXepLoai())
                 .build();
         return studentRepository.save(student1);
     }
 
     @Override
-    public Student updateStudent(Long id, Student student) {
+    public Student updateStudent(Long id, StudentDTO studentDTO) {
         Student student1 = getStudentById(id);
-        student1.setTen(student.getTen());
-        student1.setThanhPho(student.getThanhPho());
-        student1.setNgaySinh(student.getNgaySinh());
-        student1.setXepLoai(student.getXepLoai());
+        student1.setTen(studentDTO.getTen());
+        student1.setThanhPho(studentDTO.getThanhPho());
+        student1.setNgaySinh(studentDTO.getNgaySinh());
+        student1.setXepLoai(studentDTO.getXepLoai());
         return studentRepository.save(student1);
     }
 
@@ -51,8 +52,8 @@ public class StudentService implements IStudentService{
     }
 
     @Override
-    public Page<Student> getStudents(Pageable pageable) {
-        return studentRepository.findAll(pageable);
+    public Page<StudentResponse> getAllStudents(PageRequest pageRequest) {
+        return studentRepository.findAll(pageRequest).map(StudentResponse::fromStudent);
     }
 
     @Override
