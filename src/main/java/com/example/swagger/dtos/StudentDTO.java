@@ -25,8 +25,8 @@ public class StudentDTO {
     @NotBlank(message = "Thanh pho khong duoc trong")
     private String thanhPho;
 
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Past(message = "Phai la 1 ngay trong qua khu")
     private LocalDate ngaySinh;
 
