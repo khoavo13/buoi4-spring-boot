@@ -2,6 +2,7 @@ package com.example.swagger.services;
 
 import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.models.Student;
+import com.example.swagger.models.XepLoai;
 import com.example.swagger.repositories.StudentRepository;
 import com.example.swagger.responses.StudentResponse;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +70,20 @@ public class StudentService implements IStudentService{
     @Override
     public List<Student> findByThanhPhoAndTen(String name) {
         return studentRepository.findByThanhPhoAndTen(name);
+    }
+
+    @Override
+    public List<Student> findByYearOfBirthBetween(int startYear, int endYear) {
+        return studentRepository.findByYearOfBirthBetween(startYear, endYear);
+    }
+
+    @Override
+    public List<Student> findByXepLoai(XepLoai xepLoai) {
+        return studentRepository.findByXepLoai(xepLoai);
+    }
+
+    @Override
+    public List<Student> search(String ten, XepLoai xepLoai, int startYear, int endYear) {
+        return studentRepository.search(ten, xepLoai, startYear, endYear);
     }
 }

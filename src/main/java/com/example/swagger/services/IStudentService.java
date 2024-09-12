@@ -2,6 +2,7 @@ package com.example.swagger.services;
 
 import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.models.Student;
+import com.example.swagger.models.XepLoai;
 import com.example.swagger.responses.StudentResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,4 +20,7 @@ public interface IStudentService {
     List<Student> findByTen(String ten);
     List<Student> findByThanhPho(String name);
     List<Student> findByThanhPhoAndTen(String name);
+    List<Student> findByYearOfBirthBetween(int startYear, int endYear);
+    List<Student> findByXepLoai(XepLoai name);
+    List<Student> search(String ten, XepLoai xepLoai, int startYear, int endYear);
 }

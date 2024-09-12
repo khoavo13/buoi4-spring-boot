@@ -3,6 +3,7 @@ package com.example.swagger.controllers;
 import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.exceptions.ResourceNotFoundException;
 import com.example.swagger.models.Student;
+import com.example.swagger.models.XepLoai;
 import com.example.swagger.responses.ApiResponse;
 import com.example.swagger.responses.StudentListResponse;
 import com.example.swagger.responses.StudentResponse;
@@ -31,7 +32,7 @@ public class StudentController {
 
     @PostMapping("")
     public ResponseEntity<ApiResponse>  addStudent(@Valid @RequestBody StudentDTO studentDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()){
             List<String> errors = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
             ApiResponse apiResponse = ApiResponse.builder()
                     .data(errors)
@@ -60,6 +61,7 @@ public class StudentController {
                 .build();
         return ResponseEntity.ok().body(apiResponse);
     }
+
     @GetMapping("/search1")
     public ResponseEntity<ApiResponse> search1(@RequestParam String name){
         ApiResponse apiResponse = ApiResponse.builder()
@@ -84,6 +86,35 @@ public class StudentController {
     public ResponseEntity<ApiResponse> search3(@RequestParam String name){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(studentService.findByThanhPhoAndTen(name))
+                .message("Search successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok().body(apiResponse);
+    }
+    @GetMapping("/search4")
+    public ResponseEntity<ApiResponse> search4(@RequestParam int startYear, @RequestParam int endYear){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(studentService.findByYearOfBirthBetween(startYear, endYear))
+                .message("Search successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok().body(apiResponse);
+    }
+
+    @GetMapping("/searchXepLoai")
+    public ResponseEntity<ApiResponse> searchXepLoai(@RequestParam XepLoai name){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(studentService.findByXepLoai(name))
+                .message("Search successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok().body(apiResponse);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse> search(@RequestParam String ten, @RequestParam XepLoai xepLoai, @RequestParam int startYear, @RequestParam int endYear){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(studentService.search(ten, xepLoai, startYear, endYear))
                 .message("Search successfully")
                 .status(HttpStatus.OK.value())
                 .build();
@@ -143,7 +174,7 @@ public class StudentController {
         }
         studentService.deleteStudent(id);
         ApiResponse apiResponse = ApiResponse.builder()
-                .data(null)
+                .data(id)
                 .message("Deleted successfully")
                 .status(HttpStatus.OK.value())
                 .build();
