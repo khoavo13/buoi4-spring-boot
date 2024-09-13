@@ -4,6 +4,7 @@ import com.example.swagger.dtos.StudentDTO;
 import com.example.swagger.dtos.StudentImageDTO;
 import com.example.swagger.exceptions.ResourceNotFoundException;
 import com.example.swagger.models.Student;
+import com.example.swagger.models.StudentImage;
 import com.example.swagger.models.XepLoai;
 import com.example.swagger.responses.ApiResponse;
 import com.example.swagger.responses.StudentListResponse;
@@ -13,15 +14,23 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/student")
@@ -175,23 +184,46 @@ public class StudentController {
     }
 
     @PostMapping("/uploads/{id}")
-    public ResponseEntity<ApiResponse>  uploads(@PathVariable Long id, @Valid @RequestBody StudentImageDTO studentImageDTO, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
-            List<String> errors = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
-            ApiResponse apiResponse = ApiResponse.builder()
-                    .data(errors)
-                    .message("Validation failed")
-                    .status(HttpStatus.BAD_REQUEST.value())
+    public ResponseEntity<ApiResponse>  uploads(@PathVariable Long id, @ModelAttribute("files") List<MultipartFile> files) throws IOException {
+        List<StudentImage> studentImages = new ArrayList<>();
+        int count = 0;
+        for (MultipartFile file : files) {
+            if (file != null) {
+                if (file.getSize() == 0){
+                    count++;
+                    continue;
+                }
+            }
+            String fileName = storeFile(file);
+            StudentImageDTO studentImageDTO = StudentImageDTO.builder()
+                    .imageUrl(fileName)
                     .build();
-            return ResponseEntity.badRequest().body(apiResponse);
+            StudentImage studentImage = studentService.saveStudentImage(id, studentImageDTO);
+            if (studentImage.getStudent() == null) {
+                throw new ResourceNotFoundException("Student khong tim thay voi id: " + id);
+            }
+            studentImages.add(studentImage);
         }
+
+
         ApiResponse apiResponse = ApiResponse.builder()
-                .data(studentService.saveStudentImage(id, studentImageDTO))
+                .data(studentImages)
                 .message("Upload images successfully")
                 .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(apiResponse);
+    }
 
+    private String storeFile(MultipartFile file) throws IOException {
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String uniqueFileName = UUID.randomUUID().toString() +  "_" + fileName;
+        Path uploadDir = Paths.get("uploads");
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectory(uploadDir);
+        }
+        Path destination = Paths.get(uploadDir.toString(), uniqueFileName);
+        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        return uniqueFileName;
     }
 
     @PutMapping("/{id}")
