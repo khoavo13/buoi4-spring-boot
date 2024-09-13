@@ -2,6 +2,9 @@ package com.example.swagger.repositories;
 
 import com.example.swagger.models.Student;
 import com.example.swagger.models.XepLoai;
+import com.example.swagger.responses.StudentResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,5 +32,5 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "(:ten IS NULL OR s.ten LIKE LOWER(CONCAT('%', :ten, '%'))) AND " +
             "(:startYear IS NULL OR year(s.ngaySinh) >= :startYear) AND" +
             "(:endYear IS NULL OR year(s.ngaySinh) <= :endYear)")
-    List<Student> search(@Param("ten") String ten, @Param("xepLoai") XepLoai xepLoai, @Param("startYear") int startYear, @Param("endYear") int endYear);
+    Page<Student> search(@Param("ten") String ten, @Param("xepLoai") XepLoai xepLoai, @Param("startYear") int startYear, @Param("endYear") int endYear, PageRequest pageRequest);
 }

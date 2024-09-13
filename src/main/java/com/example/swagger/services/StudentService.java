@@ -83,7 +83,7 @@ public class StudentService implements IStudentService{
     }
 
     @Override
-    public List<Student> search(String ten, XepLoai xepLoai, int startYear, int endYear) {
-        return studentRepository.search(ten, xepLoai, startYear, endYear);
+    public Page<StudentResponse> search(String ten, XepLoai xepLoai, int startYear, int endYear, PageRequest pageRequest) {
+        return studentRepository.search(ten, xepLoai, startYear, endYear, pageRequest).map(StudentResponse::fromStudent);
     }
 }

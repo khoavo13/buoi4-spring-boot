@@ -22,5 +22,5 @@ public interface IStudentService {
     List<Student> findByThanhPhoAndTen(String name);
     List<Student> findByYearOfBirthBetween(int startYear, int endYear);
     List<Student> findByXepLoai(XepLoai name);
-    List<Student> search(String ten, XepLoai xepLoai, int startYear, int endYear);
+    Page<?> search(String ten, XepLoai xepLoai, int startYear, int endYear, PageRequest pageRequest);
 }

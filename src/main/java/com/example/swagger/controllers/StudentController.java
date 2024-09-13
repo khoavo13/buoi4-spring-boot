@@ -112,12 +112,33 @@ public class StudentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse> search(@RequestParam String ten, @RequestParam XepLoai xepLoai, @RequestParam int startYear, @RequestParam int endYear){
+    public ResponseEntity<ApiResponse> search(@RequestParam String ten,
+                                              @RequestParam XepLoai xepLoai,
+                                              @RequestParam int startYear,
+                                              @RequestParam int endYear,
+                                              @RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "5") int size){
+//        ApiResponse apiResponse = ApiResponse.builder()
+//                .data(studentService.search(ten, xepLoai, startYear, endYear))
+//                .message("Search successfully")
+//                .status(HttpStatus.OK.value())
+//                .build();
+//        return ResponseEntity.ok().body(apiResponse);
+
+        PageRequest pageRequest =  PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<StudentResponse> studentPage = studentService.search(ten, xepLoai, startYear, endYear, pageRequest);
+        int totalPages = studentPage.getTotalPages();
+        List<StudentResponse> studentList = studentPage.getContent();
+        StudentListResponse studentListResponse = StudentListResponse.builder()
+                .students(studentList)
+                .totalPages(totalPages)
+                .build();
         ApiResponse apiResponse = ApiResponse.builder()
-                .data(studentService.search(ten, xepLoai, startYear, endYear))
-                .message("Search successfully")
+                .data(studentListResponse)
+                .message("Show students search successfully")
                 .status(HttpStatus.OK.value())
                 .build();
+
         return ResponseEntity.ok().body(apiResponse);
     }
 
