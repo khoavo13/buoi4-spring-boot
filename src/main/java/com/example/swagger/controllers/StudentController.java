@@ -1,6 +1,7 @@
 package com.example.swagger.controllers;
 
 import com.example.swagger.dtos.StudentDTO;
+import com.example.swagger.dtos.StudentImageDTO;
 import com.example.swagger.exceptions.ResourceNotFoundException;
 import com.example.swagger.models.Student;
 import com.example.swagger.models.XepLoai;
@@ -161,6 +162,36 @@ public class StudentController {
                 .build();
 
         return ResponseEntity.ok().body(apiResponse);
+    }
+
+    @GetMapping("/getAllImage/{id}")
+    public ResponseEntity<ApiResponse> getAllImages(@PathVariable Long id){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(studentService.getStudentImages(id))
+                .message("Get image of " + id + " successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok().body(apiResponse);
+    }
+
+    @PostMapping("/uploads/{id}")
+    public ResponseEntity<ApiResponse>  uploads(@PathVariable Long id, @Valid @RequestBody StudentImageDTO studentImageDTO, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()){
+            List<String> errors = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .data(errors)
+                    .message("Validation failed")
+                    .status(HttpStatus.BAD_REQUEST.value())
+                    .build();
+            return ResponseEntity.badRequest().body(apiResponse);
+        }
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(studentService.saveStudentImage(id, studentImageDTO))
+                .message("Upload images successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok(apiResponse);
+
     }
 
     @PutMapping("/{id}")

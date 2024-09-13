@@ -1,8 +1,11 @@
 package com.example.swagger.services;
 
 import com.example.swagger.dtos.StudentDTO;
+import com.example.swagger.dtos.StudentImageDTO;
 import com.example.swagger.models.Student;
+import com.example.swagger.models.StudentImage;
 import com.example.swagger.models.XepLoai;
+import com.example.swagger.repositories.StudentImageRepository;
 import com.example.swagger.repositories.StudentRepository;
 import com.example.swagger.responses.StudentResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentService implements IStudentService{
     private final StudentRepository studentRepository;
+    private final StudentImageRepository studentImageRepository;
     @Override
     public Student addStudent(StudentDTO studentDTO) {
         Student student1 = Student.builder()
@@ -85,5 +89,21 @@ public class StudentService implements IStudentService{
     @Override
     public Page<StudentResponse> search(String ten, XepLoai xepLoai, int startYear, int endYear, PageRequest pageRequest) {
         return studentRepository.search(ten, xepLoai, startYear, endYear, pageRequest).map(StudentResponse::fromStudent);
+    }
+
+    @Override
+    public StudentImage saveStudentImage(Long studentId, StudentImageDTO studentImageDTO) {
+        Student student = getStudentById(studentId);
+        StudentImage studentImage = StudentImage.builder()
+                .student(student)
+                .imageUrl(studentImageDTO.getImageUrl())
+                .build();
+
+        return studentImageRepository.save(studentImage);
+    }
+
+    @Override
+    public List<StudentImage> getStudentImages(Long studentId) {
+        return studentImageRepository.findByStudentId(studentId);
     }
 }
