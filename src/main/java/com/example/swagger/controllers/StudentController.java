@@ -12,10 +12,12 @@ import com.example.swagger.responses.StudentResponse;
 import com.example.swagger.services.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -212,6 +214,28 @@ public class StudentController {
                 .status(HttpStatus.OK.value())
                 .build();
         return ResponseEntity.ok(apiResponse);
+    }
+
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName){
+        try {
+            Path imagePath = Paths.get("uploads/" + imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()){
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }
+            else {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(new UrlResource(Paths.get("uploads/notfound.jpeg").toUri()));
+            }
+        }
+        catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private String storeFile(MultipartFile file) throws IOException {
