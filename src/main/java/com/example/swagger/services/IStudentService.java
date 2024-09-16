@@ -27,4 +27,6 @@ public interface IStudentService {
     Page<?> search(String ten, XepLoai xepLoai, int startYear, int endYear, PageRequest pageRequest);
     StudentImage saveStudentImage(Long studentId, StudentImageDTO studentImageDTO);
     List<StudentImage> getStudentImages(Long studentId);
+    void deleteImage(Long id);
+    StudentImage getImageById(Long id);
 }

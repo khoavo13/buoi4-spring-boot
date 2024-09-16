@@ -288,4 +288,20 @@ public class StudentController {
                 .build();
         return ResponseEntity.ok().body(apiResponse);
     }
+
+    @DeleteMapping("/image/{imageId}")
+    public ResponseEntity<ApiResponse> deleleImage(@PathVariable Long imageId){
+        StudentImage studentImage = studentService.getImageById(imageId);
+        if (studentImage == null) {
+            throw new ResourceNotFoundException("Image khong tim thay voi id: " + imageId);
+        }
+        studentService.deleteImage(imageId);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(imageId)
+                .message("Deleted image successfully")
+                .status(HttpStatus.OK.value())
+                .build();
+        return ResponseEntity.ok().body(apiResponse);
+    }
 }

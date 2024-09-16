@@ -98,4 +98,14 @@ public class StudentService implements IStudentService{
     public List<StudentImage> getStudentImages(Long studentId) {
         return studentImageRepository.findByStudentId(studentId);
     }
+
+    @Override
+    public void deleteImage(Long id) {
+        studentImageRepository.deleteById(id);
+    }
+
+    @Override
+    public StudentImage getImageById(Long id) {
+        return studentImageRepository.findById(id).orElse(null);
+    }
 }
